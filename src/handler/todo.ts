@@ -1,21 +1,11 @@
 import { APIGatewayProxyEvent, APIGatewayProxyResult } from "aws-lambda";
-import { DynamoDB } from "aws-sdk";
 import { Todo } from "../types/todo";
 import { v4 as uuidv4 } from "uuid";
-
-const dynamoDb = new DynamoDB.DocumentClient();
+import { connectToDatabase } from "../utils/mongodb";
 
 export const getTodos = async (): Promise<APIGatewayProxyResult> => {
-  // const todos = await dynamoDb
-  //   .scan({
-  //     TableName: process.env.TABLE_NAME!,
-  //   })
-  //   .promise();
-  const todos = [
-    { id: "1", title: "Todo 1", completed: false },
-    { id: "2", title: "Todo 2", completed: false },
-    { id: "3", title: "Todo 3", completed: false },
-  ];
+  const db = await connectToDatabase(); 
+  const todos = await db.collection("todos").find().toArray();
   return {
     statusCode: 200,
     body: JSON.stringify({ message: "Todos fetched successfully", todos }),
@@ -41,12 +31,9 @@ export const createTodo = async (
     updatedAt: new Date().toISOString(),
   };
 
-  // await dynamoDb
-  //   .put({
-  //     TableName: process.env.TABLE_NAME!,
-  //     Item: todo,
-  //   })
-  //   .promise();
+  const db = await connectToDatabase();
+  const result = await db.collection("todos").insertOne(todo);
+  todo.id = result.insertedId.toString();
 
   return {
     statusCode: 201,

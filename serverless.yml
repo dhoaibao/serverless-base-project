@@ -9,9 +9,9 @@ provider:
   name: aws
   runtime: nodejs20.x
   stage: ${opt:stage, 'dev'}
-  region: ap-southeast-1
+  region: ${opt:region, 'ap-southeast-1'}
   environment:
-    TABLE_NAME: ${self:service}-${sls:stage}-todos
+    MONGODB_URI: ${env:MONGODB_URI}
   httpApi:
     cors: true
 
