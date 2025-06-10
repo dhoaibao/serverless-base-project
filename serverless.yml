@@ -1,0 +1,47 @@
+# "org" ensures this Service is used with the correct Serverless Framework Access Key.
+org: dhoaibao
+# "app" enables Serverless Framework Dashboard features and sharing them with other Services.
+app: my-app
+# "service" is the name of this project. This will also be added to your AWS resource names.
+service: serverles-base-project
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  stage: ${opt:stage, 'dev'}
+  region: ap-southeast-1
+  environment:
+    TABLE_NAME: ${self:service}-${sls:stage}-todos
+  httpApi:
+    cors: true
+
+functions:
+  createTodo:
+    handler: src/handler/todo.createTodo
+    events:
+      - httpApi:
+          path: /todo
+          method: post
+  getTodos:
+    handler: src/handler/todo.getTodos
+    events:
+      - httpApi:
+          path: /todo
+          method: get
+  # updateTodo:
+  #   handler: handler/updateTodo
+  #   events:
+  #     - httpApi:
+  #         path: /{id}
+  #         method: put
+  #         cors: true
+  # deleteTodo:
+  #   handler: handler/deleteTodo
+  #   events:
+  #     - httpApi:
+  #         path: /{id}
+  #         method: delete
+  #         cors: true
+
+plugins:
+  - serverless-offline
